@@ -1,0 +1,36 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Banking", "Banking\Banking.csproj", "{304B7477-3739-41FD-9ADC-8FFAAA77F332}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Banking.Gtk", "Banking.Gtk\Banking.Gtk.csproj", "{2034EAEC-EF6A-49F1-A0B1-6F9B32B67652}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Banking.Mac", "Banking.Mac\Banking.Mac.csproj", "{9FA89293-FBF9-41A3-934E-0653BF72042F}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Banking.Wpf", "Banking.Wpf\Banking.Wpf.csproj", "{84F82A62-F414-40CB-B3AB-62078342A463}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{304B7477-3739-41FD-9ADC-8FFAAA77F332}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{304B7477-3739-41FD-9ADC-8FFAAA77F332}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{304B7477-3739-41FD-9ADC-8FFAAA77F332}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{304B7477-3739-41FD-9ADC-8FFAAA77F332}.Release|Any CPU.Build.0 = Release|Any CPU
+		{2034EAEC-EF6A-49F1-A0B1-6F9B32B67652}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{2034EAEC-EF6A-49F1-A0B1-6F9B32B67652}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{2034EAEC-EF6A-49F1-A0B1-6F9B32B67652}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{2034EAEC-EF6A-49F1-A0B1-6F9B32B67652}.Release|Any CPU.Build.0 = Release|Any CPU
+		{9FA89293-FBF9-41A3-934E-0653BF72042F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{9FA89293-FBF9-41A3-934E-0653BF72042F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{9FA89293-FBF9-41A3-934E-0653BF72042F}.Debug|Any CPU.Deploy.0 = Debug|Any CPU
+		{9FA89293-FBF9-41A3-934E-0653BF72042F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{9FA89293-FBF9-41A3-934E-0653BF72042F}.Release|Any CPU.Build.0 = Release|Any CPU
+		{9FA89293-FBF9-41A3-934E-0653BF72042F}.Release|Any CPU.Deploy.0 = Release|Any CPU
+		{84F82A62-F414-40CB-B3AB-62078342A463}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{84F82A62-F414-40CB-B3AB-62078342A463}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{84F82A62-F414-40CB-B3AB-62078342A463}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{84F82A62-F414-40CB-B3AB-62078342A463}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+EndGlobal
