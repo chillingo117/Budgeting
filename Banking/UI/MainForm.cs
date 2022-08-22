@@ -25,7 +25,6 @@ namespace Banking.UI
             ToolBar = new ToolBar();
             AttachOpenFileDialog();
             AttachAddBucketDialog();
-            AttachShowChartDialog();
             AttachSaveSummaryDialog();
             
             Closed += OnClosed;
@@ -90,18 +89,6 @@ namespace Banking.UI
             };
             ToolBar.Items.Add(addBucket);
         }
-        
-        private void AttachShowChartDialog()
-        {
-            var showChart = new Command {ToolBarText = "Show Chart"};
-            showChart.Executed += (sender, e) => {     
-                var names = Sorter.Buckets.Select(b => b.Name).ToArray();
-                var values = Sorter.Buckets.Select(b => b.Total()).ToArray();
-                var chart = Chart2D.Chart.Column<string, decimal, string>(names, values);
-                chart.Show();
-            };
-            ToolBar.Items.Add(showChart);
-        }
 
         private void AttachSaveSummaryDialog()
         {
@@ -118,12 +105,7 @@ namespace Banking.UI
                 if(String.IsNullOrEmpty(outputDirectory) || String.IsNullOrWhiteSpace(outputDirectory))
                     return;
             
-                var toWrite = Sorter.Buckets.Select(b => new OutBucket
-                    {
-                        Name = b.Name,
-                        Total = b.Total()
-                    }
-                );
+                var toWrite = Sorter.Buckets.SelectMany(b => b.CategoriseBuckets());
                 using(var writer = new StreamWriter(outputDirectory))
                 using (var csv = new CsvWriter(writer, CultureInfo.InvariantCulture))
                 {

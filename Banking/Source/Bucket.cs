@@ -20,13 +20,13 @@ namespace Banking.Source
         public string Name { get; }
         public readonly List<Transaction> Transactions = new List<Transaction>();
 
-        public decimal Total()
+        public List<CategorisedTransaction> CategoriseBuckets()
         {
             if (Transactions == null || !Transactions.Any())
-                return 0;
+                return new List<CategorisedTransaction>();
             
-            return Transactions.Select(trans => trans.Amount)
-                .Sum();
+            return Transactions.Select(trans => new CategorisedTransaction(trans, Name))
+                .ToList();
         }
     }
 
