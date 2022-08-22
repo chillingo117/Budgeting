@@ -26,6 +26,7 @@ namespace Source
             Particulars = transaction.Particulars;
             Code = transaction.Code;
             Reference = transaction.Reference;
+            OtherPartyAccount = transaction.OtherPartyAccount;
             Bucket = bucketName;
         }
     }
