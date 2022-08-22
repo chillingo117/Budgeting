@@ -11,6 +11,7 @@ namespace Source
         public string Particulars { get; set; }
         public string Code { get; set; }
         public string Reference { get; set; }
+        public string OtherPartyAccount { get; set; }
     }
     
     public class CategorisedTransaction : Transaction

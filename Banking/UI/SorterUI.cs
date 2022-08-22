@@ -29,14 +29,22 @@ namespace Banking.UI
 
         public StackLayout Layout()
         {
-            var layout = new StackLayout();
-            layout.Orientation = Orientation.Horizontal;
+            var layout = new StackLayout{Width = 1200, Spacing = 10};
+
+            var count = 0;
+            var subLayoutRow = new StackLayout{Width = 1200, Orientation = Orientation.Horizontal, Spacing = 5};
+
             foreach (var bucket in Sorter.Buckets)
             {
-                layout.Items.Add(new BucketUi(bucket, AddCurrentTransactionToBucket, RemoveBucket)
-                    .Layout);
+                subLayoutRow.Items.Add(new BucketUi(bucket, AddCurrentTransactionToBucket, RemoveBucket).Layout);
+                if (count++ > 10)
+                {
+                    count = 0;
+                    layout.Items.Add(subLayoutRow);
+                    subLayoutRow = new StackLayout{Width = 1200, Orientation = Orientation.Horizontal, Spacing = 5};
+                }
             }
-
+            layout.Items.Add(subLayoutRow);
             return layout;
         }
     }

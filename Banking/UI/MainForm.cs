@@ -54,8 +54,9 @@ namespace Banking.UI
             new TableCell(new Label {Text = "Payee"}, true),
             new TableCell(new Label {Text = "Particulars"}, true),
             new TableCell(new Label {Text = "Code"}, true),
-            new TableCell(new Label {Text = "Reference"}, true)
-        );
+            new TableCell(new Label {Text = "Reference"}, true),
+            new TableCell(new Label {Text = "Other Party Account"}, true)
+            );
         
         private void AttachOpenFileDialog()
         {
@@ -68,9 +69,9 @@ namespace Banking.UI
                 };
                 dialog.ShowDialog(this);
                 
-                var filename = dialog.Filenames.FirstOrDefault();
-                if (filename != null)
-                    Sorter.LoadData(filename);
+                OpenedFilename = dialog.Filenames.FirstOrDefault();
+                if (OpenedFilename != null)
+                    Sorter.LoadData(OpenedFilename);
                 RefreshUi();
             };
             
@@ -83,8 +84,7 @@ namespace Banking.UI
             addBucket.Executed += (sender, e) => {     
                 var dialog = new AddBucketDialog();
                 dialog.ShowModal(this);
-                OpenedFilename = dialog.Result;
-                Sorter.AddBucket(OpenedFilename);
+                Sorter.AddBucket(dialog.Result);
                 RefreshUi();
             };
             ToolBar.Items.Add(addBucket);
@@ -128,11 +128,10 @@ namespace Banking.UI
                     new TableCell(new Label {Text = currentTransaction.Payee}, true),
                     new TableCell(new Label {Text = currentTransaction.Particulars}, true),
                     new TableCell(new Label {Text = currentTransaction.Code}, true),
-                    new TableCell(new Label {Text = currentTransaction.Reference}, true)
+                    new TableCell(new Label {Text = currentTransaction.Reference}, true),
+                    new TableCell(new Label {Text = currentTransaction.OtherPartyAccount}, true)
                 );
             }
-
-           
             return new TableRow();
         }
 
