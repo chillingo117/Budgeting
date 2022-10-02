@@ -1,5 +1,6 @@
 
 using Banking.Source;
+using CsvHelper.Configuration.Attributes;
 
 namespace Source
 {
@@ -11,6 +12,8 @@ namespace Source
         public string Particulars { get; set; }
         public string Code { get; set; }
         public string Reference { get; set; }
+        
+        [Name("Other Party Account")]
         public string OtherPartyAccount { get; set; }
     }
     
