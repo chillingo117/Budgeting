@@ -1,4 +1,5 @@
 
+using System;
 using Banking.Source;
 using CsvHelper.Configuration.Attributes;
 
@@ -20,10 +21,12 @@ namespace Source
     public class CategorisedTransaction : Transaction
     {
         public string Bucket { get; set; }
+        public DateTime ModifiedOn { get; set; }
 
         public CategorisedTransaction(Transaction transaction, string bucketName)
         {
             Date = transaction.Date;
+            ModifiedOn = DateTime.UtcNow;
             Amount = transaction.Amount;
             Payee = transaction.Payee;
             Particulars = transaction.Particulars;
