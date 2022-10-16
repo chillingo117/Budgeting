@@ -1,0 +1,4 @@
+ - Allow mass bucketing based on regex
+ - Allow undoing on a transaction by transaction basis
+ - Allow buckets to be draggable
+ 

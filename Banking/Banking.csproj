@@ -10,4 +10,22 @@
         <PackageReference Include="Plotly.NET" Version="2.0.0-preview.8" />
     </ItemGroup>
 
+    <ItemGroup>
+      <None Update="Source\Client\Banking.sync">
+        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      </None>
+      <None Remove="Source\Client\Banking_Files\Logs\**" />
+      <None Remove="Source\Client\Banking_Files\**" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <Compile Remove="Source\Client\Banking_Files\Logs\**" />
+      <Compile Remove="Source\Client\Banking_Files\**" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <EmbeddedResource Remove="Source\Client\Banking_Files\Logs\**" />
+      <EmbeddedResource Remove="Source\Client\Banking_Files\**" />
+    </ItemGroup>
+
 </Project>
