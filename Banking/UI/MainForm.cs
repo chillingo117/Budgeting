@@ -92,26 +92,7 @@ namespace Banking.UI
 
         private void AttachSaveSummaryDialog()
         {
-            var saveSummary = new Command {ToolBarText = "Save Summary"};
-            saveSummary.Executed += (sender, e) =>
-            {
-                var dialog = new SaveFileDialog{
-                    FileName = $"{OpenedFilename}_Summary",
-                    Filters = { new FileFilter("csvs", ".csv")}
-                };
-            
-                dialog.ShowDialog(this);
-                var outputDirectory = dialog.FileName;
-                if(String.IsNullOrEmpty(outputDirectory) || String.IsNullOrWhiteSpace(outputDirectory))
-                    return;
-            
-                var toWrite = Sorter.Buckets.SelectMany(b => b.CategoriseBuckets());
-                using(var writer = new StreamWriter(outputDirectory))
-                using (var csv = new CsvWriter(writer, CultureInfo.InvariantCulture))
-                {
-                    csv.WriteRecords(toWrite);
-                }
-            };
+            var saveSummary = new SaveSummaryCommand(Sorter);
             ToolBar.Items.Add(saveSummary);
         }
         

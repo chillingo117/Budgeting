@@ -57,6 +57,7 @@ namespace Banking.Source
             using (var reader = new StreamReader(file))
             using (var csv = new CsvReader(reader, CultureInfo.InvariantCulture))
             {
+                csv.Context.RegisterClassMap<TransactionCsvMap>();
                 _transactions = csv.GetRecords<Transaction>().ToList();
             }
         }
