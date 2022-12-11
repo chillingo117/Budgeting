@@ -16,6 +16,14 @@
       </None>
       <None Remove="Source\Client\Banking_Files\Logs\**" />
       <None Remove="Source\Client\Banking_Files\**" />
+      <None Update="Source\Client\TestBanking.sync">
+        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      </None>
+      <None Remove="Source\Client\Banking.sync.backup" />
+      <None Remove="Source\Client\SyncLog-20221017-115725.log" />
+      <None Remove="Source\Client\SyncLog-20221017-120034.log" />
+      <None Remove="Source\Client\SyncLog-20221017-120634.log" />
+      <None Remove="Source\Client\SyncLog-20221017-121623.log" />
     </ItemGroup>
 
     <ItemGroup>

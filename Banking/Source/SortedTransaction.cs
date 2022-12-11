@@ -3,12 +3,12 @@ using Banking.Source;
 
 namespace Source
 {
-    public class CategorisedTransaction : Transaction
+    public class SortedTransaction : Transaction
     {
         public string Bucket { get; set; }
         public DateTime ModifiedOn { get; set; }
 
-        public CategorisedTransaction(Transaction transaction, string bucketName)
+        public SortedTransaction(Transaction transaction, string bucketName)
         {
             Date = transaction.Date;
             ModifiedOn = DateTime.UtcNow;
@@ -18,13 +18,14 @@ namespace Source
             Code = transaction.Code;
             Reference = transaction.Reference;
             OtherPartyAccount = transaction.OtherPartyAccount;
+            Guid = transaction.Guid;
             Bucket = bucketName;
         }
     }
     
-    public sealed class CategorisedTransactionCsvMap : CsvHelper.Configuration.ClassMap<CategorisedTransaction>
+    public sealed class SortedTransactionCsvMap : CsvHelper.Configuration.ClassMap<SortedTransaction>
     {
-        public CategorisedTransactionCsvMap()
+        public SortedTransactionCsvMap()
         {
             string format = "dd/MM/yyyy HH:mm:ss";
             Map(m => m.Date).Name("Date").TypeConverterOption.Format(format);
@@ -36,6 +37,7 @@ namespace Source
             Map(m => m.Reference).Name("Reference");
             Map(m => m.OtherPartyAccount).Name(Constants.OtherPartyAccountColumnName);
             Map(m => m.Bucket).Name("Bucket");
+            Map(m => m.Guid).Name("Guid");
         }
     }
 }

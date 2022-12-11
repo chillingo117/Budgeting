@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
@@ -9,6 +10,11 @@ namespace Banking.Source
 {
     public class Sorter
     {
+        public class Bucket
+        {
+            public string Name { get; set; }
+        }
+
         public Sorter()
         {
             if (File.Exists(Constants.BucketDataFilename))
@@ -16,40 +22,50 @@ namespace Banking.Source
                 using (var reader = new StreamReader(Constants.BucketDataFilename))
                 using (var csv = new CsvReader(reader, CultureInfo.InvariantCulture))
                 {
-                    Buckets = csv.GetRecords<BucketName>()
-                        .Select(bn => new Bucket(bn.Name))
-                        .ToList();
+                    Buckets = csv.GetRecords<Bucket>().ToList();
                 }
-
             }
         }
 
-        public readonly List<Bucket> Buckets = new List<Bucket>();
         public Transaction CurrentTransaction => _transactions.FirstOrDefault();
+        
+        public readonly List<Bucket> Buckets = new List<Bucket>();
+
+        public List<SortedTransaction> SortedTransactions = new List<SortedTransaction>();
+
         private List<Transaction> _transactions = new List<Transaction>();
 
-        public void AddBucket(string name)
+        public void AddBucket(string bucketName)
         {
-            if(name == null)
+            if(String.IsNullOrWhiteSpace(bucketName))
                 return;
-            if(!Buckets.Exists(b => b.Name == name))
-                Buckets.Add(new Bucket(name));
+            if(!Buckets.Exists(b => b.Name == bucketName))
+                Buckets.Add(new Bucket{Name = bucketName});
         }
 
-        public void RemoveBucket(string name)
+        public void RemoveBucket(string bucketName)
         {
-            var bucketToRemove = Buckets.SingleOrDefault(b => b.Name == name);
+            var bucketToRemove = Buckets.SingleOrDefault(b => b.Name == bucketName);
             if (bucketToRemove == null)
                 return;
 
-            _transactions.AddRange(bucketToRemove.Transactions);
+            _transactions.InsertRange(0, SortedTransactions.Where(st => st.Bucket == bucketName));
+            SortedTransactions = SortedTransactions.Where(st => st.Bucket != bucketName).ToList();
+
             Buckets.Remove(bucketToRemove);
         }
 
-        public void AddCurrentTransactionToBucket(string name)
+        public void AssignTransactionToBucket(string name)
         {
-            Buckets.Single(b => b.Name == name).AddTransaction(CurrentTransaction);
+            SortedTransactions.Add(new SortedTransaction(CurrentTransaction, name));
             _transactions.Remove(CurrentTransaction);
+        }
+
+        public void UndoTransactionSort(Guid transactionId)
+        {
+            var transactionToUnsort = SortedTransactions.Find(st => st.Guid == transactionId);
+            SortedTransactions.Remove(transactionToUnsort);
+            _transactions.Insert(0, transactionToUnsort);
         }
 
         public void LoadData(string file)
@@ -59,6 +75,7 @@ namespace Banking.Source
             {
                 csv.Context.RegisterClassMap<TransactionCsvMap>();
                 _transactions = csv.GetRecords<Transaction>().ToList();
+                _transactions.ForEach(t => t.Guid = Guid.NewGuid());
             }
         }
     }

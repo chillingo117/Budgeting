@@ -1,4 +1,3 @@
-using System;
 using System.IO;
 
 namespace Banking.Source
@@ -12,5 +11,11 @@ namespace Banking.Source
         public static readonly string OtherPartyAccountColumnName = "Other Party Account";
 
         public static readonly string SummaryFileName = Path.Combine(BasePath, "summary.csv");
+
+        public static readonly string TestArg = "-test";
+        
+        public static readonly string ConfigName = "Banking.sync";
+        
+        public static readonly string TestConfigName = "TestBanking.sync";
     }
 }

@@ -5,6 +5,20 @@ namespace Source
 {
     public class Transaction
     {
+        protected Transaction(){}
+
+        public Transaction(SortedTransaction transaction)
+        {
+            Date = transaction.Date;
+            Amount = transaction.Amount;
+            Payee = transaction.Payee;
+            Particulars = transaction.Particulars;
+            Code = transaction.Code;
+            Reference = transaction.Reference;
+            OtherPartyAccount = transaction.OtherPartyAccount;
+            Guid = transaction.Guid;
+        }
+
         public DateTime Date { get; set; }
         public decimal Amount { get; set; }
         public string Payee { get; set; }
@@ -12,6 +26,7 @@ namespace Source
         public string Code { get; set; }
         public string Reference { get; set; }
         public string OtherPartyAccount { get; set; }
+        public Guid Guid { get; set; }
     }
     
     public sealed class TransactionCsvMap : CsvHelper.Configuration.ClassMap<Transaction>
@@ -26,6 +41,7 @@ namespace Source
             Map(m => m.Code).Name("Code");
             Map(m => m.Reference).Name("Reference");
             Map(m => m.OtherPartyAccount).Name(Constants.OtherPartyAccountColumnName);
+            Map(m => m.Guid).Ignore();
         }
     }
 }

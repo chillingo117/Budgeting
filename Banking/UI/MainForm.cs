@@ -1,5 +1,4 @@
 using System;
-using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
 using System.Linq;
@@ -7,26 +6,38 @@ using Banking.Source;
 using CsvHelper;
 using Eto.Drawing;
 using Eto.Forms;
-using Plotly.NET;
 
 namespace Banking.UI
 {
+    public enum Page
+    {
+        Sorting,
+        History
+    }
+
     public class MainForm : Form
-    { 
-        public MainForm()
+    {
+        public MainForm(string[] args)
         {
+            var isTest = args.Contains(Constants.TestArg);
+            ToolBar = new ToolBar();
+            Menu = new MenuBar();
+            
             Sorter = new Sorter();
             SorterUi = new SorterUi(Sorter, RefreshUi);
+            HistoryUi = new HistoryUi(Sorter, RefreshUi);
+            CurrentPage = Page.Sorting;
+            
             Title = "It's Budgeting Time";
             MinimumSize = new Size(1200, 600);
 
             RefreshUi();
-
-            ToolBar = new ToolBar();
-            AttachOpenFileDialog();
-            AttachAddBucketDialog();
-            AttachSaveSummaryDialog();
             
+            AttachOpenFileDialog();
+            AttachSaveSummaryDialog(isTest);
+            AttachHistoryMenuItem();
+            AttachSortingMenuItem();
+
             Closed += OnClosed;
         }
 
@@ -34,7 +45,7 @@ namespace Banking.UI
         {
             var outputDirectory = Constants.BucketDataFilename;
 
-            var toWrite = Sorter.Buckets.Select(b => new BucketName {Name = b.Name}).ToList();;
+            var toWrite = Sorter.Buckets.ToList();;
             
             using (var writer = new StreamWriter(outputDirectory))
             using (var csv = new CsvWriter(writer, CultureInfo.InvariantCulture))
@@ -45,22 +56,13 @@ namespace Banking.UI
         
         private Sorter Sorter { get; }
         private SorterUi SorterUi { get; }
+        private HistoryUi HistoryUi { get; }
+        private Page CurrentPage { get; set; }
         private string OpenedFilename;
-        
-        private readonly Func<TableRow> _makeHeaderRow = 
-            () => new TableRow(
-            new TableCell(new Label {Text = "Date"}, true),
-            new TableCell(new Label {Text = "Amount"}, true),
-            new TableCell(new Label {Text = "Payee"}, true),
-            new TableCell(new Label {Text = "Particulars"}, true),
-            new TableCell(new Label {Text = "Code"}, true),
-            new TableCell(new Label {Text = "Reference"}, true),
-            new TableCell(new Label {Text = "Other Party Account"}, true)
-            );
         
         private void AttachOpenFileDialog()
         {
-            var chooseFile = new Command {MenuText = "Open File", ToolBarText = "Open File"};
+            var chooseFile = new Command {MenuText = "Open File"};
             chooseFile.Executed += (sender, e) => {
                 var dialog = new OpenFileDialog
                 {
@@ -75,76 +77,49 @@ namespace Banking.UI
                 RefreshUi();
             };
             
-            ToolBar.Items.Add(chooseFile);
+            Menu.Items.Add(chooseFile);
         }
 
-        private void AttachAddBucketDialog()
+        private void AttachSaveSummaryDialog(bool isTest)
         {
-            var addBucket = new Command {ToolBarText = "Add bucket"};
-            addBucket.Executed += (sender, e) => {     
-                var dialog = new AddBucketDialog();
-                dialog.ShowModal(this);
-                Sorter.AddBucket(dialog.Result);
+            var saveSummary = new SaveSummaryCommand(Sorter, isTest);
+            Menu.Items.Add(saveSummary);
+        }
+
+        private void AttachHistoryMenuItem()
+        {
+            var navToHistoryPage = new Command {MenuText = "History"};
+            navToHistoryPage.Executed += (sender, e) =>
+            {
+                CurrentPage = Page.History;
                 RefreshUi();
             };
-            ToolBar.Items.Add(addBucket);
-        }
-
-        private void AttachSaveSummaryDialog()
-        {
-            var saveSummary = new SaveSummaryCommand(Sorter);
-            ToolBar.Items.Add(saveSummary);
+            Menu.Items.Add(navToHistoryPage);
         }
         
-        private TableRow GetCurrentTransactionTableRow()
+        private void AttachSortingMenuItem()
         {
-            var currentTransaction = Sorter.CurrentTransaction;
-            if (currentTransaction != null)
+            var navToSortingPage = new Command {MenuText = "Sorting"};
+            navToSortingPage.Executed += (sender, e) =>
             {
-                var amountCell = new TableCell(new Label {Text = currentTransaction.Amount.ToString(CultureInfo.InvariantCulture)}, true);
-                amountCell.Control.BackgroundColor = currentTransaction.Amount < 0 ? Colors.OrangeRed : Colors.LimeGreen;
-                return new TableRow(
-                    new TableCell(new Label {Text = currentTransaction.Date.ToString(CultureInfo.InvariantCulture)}, true),
-                    amountCell,
-                    new TableCell(new Label {Text = currentTransaction.Payee}, true),
-                    new TableCell(new Label {Text = currentTransaction.Particulars}, true),
-                    new TableCell(new Label {Text = currentTransaction.Code}, true),
-                    new TableCell(new Label {Text = currentTransaction.Reference}, true),
-                    new TableCell(new Label {Text = currentTransaction.OtherPartyAccount}, true)
-                );
-            }
-            return new TableRow();
-        }
-
-        private TableRow GetSorterUiRow()
-        {
-            return  new TableRow( new TableCell(SorterUi.Layout(), true));
+                CurrentPage = Page.Sorting;
+                RefreshUi();
+            };
+            Menu.Items.Add(navToSortingPage);
         }
 
         private void RefreshUi()
         {
-            var table = new TableLayout
+            if (CurrentPage == Page.Sorting)
             {
-                Padding = 10,
-                Spacing = new Size(5, 5),
-                Rows = {
-                    _makeHeaderRow(),
-                    GetCurrentTransactionTableRow()
-                }
-            };
-            var buckets = new TableLayout
+                ToolBar = SorterUi.ToolBar;
+                Content = SorterUi.Layout();
+            }
+            else
             {
-                Padding = 10,
-                Spacing = new Size(5, 5),
-                Rows =
-                {
-                    GetSorterUiRow()
-                }
-            };
-            var overallStack = new StackLayout();
-            overallStack.Items.Add(table);
-            overallStack.Items.Add(buckets);
-            Content = overallStack;
+                ToolBar = HistoryUi.ToolBar;
+                Content = HistoryUi.Layout();
+            }
         }
     }
 }

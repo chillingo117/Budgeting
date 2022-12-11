@@ -6,11 +6,11 @@ namespace Banking.UI
 {
     public class BucketUi
     {
-        public BucketUi(Bucket bucket, Action<string> addTransactionToBucketAction, Action<string> removeBucketAction)
+        public BucketUi(Sorter.Bucket bucket, Action<string> addTransactionToBucketAction, Action<string> removeBucketAction)
         {
             Bucket = bucket;
 
-            var addToBucketButton = new Button{Text = Bucket.Name, };
+            var addToBucketButton = new Button{Text = Bucket.Name};
             addToBucketButton.Click += delegate
             {
                 addTransactionToBucketAction(Bucket.Name);
@@ -31,7 +31,7 @@ namespace Banking.UI
             };
         }
 
-        private Bucket Bucket { get; }
+        private Sorter.Bucket Bucket { get; }
         public TableLayout Layout { get; }
     }
 }
