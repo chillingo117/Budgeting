@@ -5,54 +5,36 @@ using System.IO;
 using System.Linq;
 using System.Text.RegularExpressions;
 using CsvHelper;
-using Source;
 
 namespace Banking.Source
 {
     public class Sorter
     {
-        public class Bucket
-        {
-            public string Name { get; set; }
-        }
-
-        public Sorter()
-        {
-            if (File.Exists(Constants.BucketDataFilename))
-            {
-                using (var reader = new StreamReader(Constants.BucketDataFilename))
-                using (var csv = new CsvReader(reader, CultureInfo.InvariantCulture))
-                {
-                    Buckets = csv.GetRecords<Bucket>().ToList();
-                }
-            }
-        }
-        
-        public readonly List<Bucket> Buckets = new List<Bucket>();
+        public readonly List<string> Buckets = Constants.Buckets;
 
         public List<SortedTransaction> SortedTransactions = new List<SortedTransaction>();
 
         public List<Transaction> Transactions = new List<Transaction>();
-        public string RegexFilter { get; set; }
+        public string SearchFilter { get; set; }
 
         private Transaction CurrentTransaction()
         {
-            return String.IsNullOrWhiteSpace(RegexFilter)
+            return String.IsNullOrWhiteSpace(SearchFilter)
                 ? Transactions.FirstOrDefault()
-                : GetRegexTransactions().FirstOrDefault();
+                : GetFilteredTransactions().FirstOrDefault();
         }
 
         public void AddBucket(string bucketName)
         {
             if(String.IsNullOrWhiteSpace(bucketName))
                 return;
-            if(!Buckets.Exists(b => b.Name == bucketName))
-                Buckets.Add(new Bucket{Name = bucketName});
+            if(!Buckets.Exists(b => b == bucketName))
+                Buckets.Add(bucketName);
         }
 
         public void RemoveBucket(string bucketName)
         {
-            var bucketToRemove = Buckets.SingleOrDefault(b => b.Name == bucketName);
+            var bucketToRemove = Buckets.SingleOrDefault(b => b == bucketName);
             if (bucketToRemove == null)
                 return;
 
@@ -72,7 +54,7 @@ namespace Banking.Source
         
         public void AssignAllTransactionsToBucket(string name)
         {
-            var transactions = GetRegexTransactions();
+            var transactions = GetFilteredTransactions();
             if (!transactions.Any())
                 return;
             transactions.ForEach(t =>
@@ -91,9 +73,9 @@ namespace Banking.Source
             Transactions.Insert(0, transactionToUnsort);
         }
         
-        public List<Transaction> GetRegexTransactions()
+        public List<Transaction> GetFilteredTransactions()
         {
-            return Transactions.Where(t => Regex.IsMatch(t.Payee, RegexFilter)).ToList();
+            return Transactions.Where(t => Regex.IsMatch(t.Payee, SearchFilter)).ToList();
         }
 
         public void LoadData(string file)

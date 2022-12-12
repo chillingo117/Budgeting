@@ -4,7 +4,6 @@ using System.IO;
 using Banking.Source;
 using CsvHelper;
 using Eto.Forms;
-using Source;
 using ProcessStartInfo = System.Diagnostics.ProcessStartInfo;
 
 namespace Banking.UI

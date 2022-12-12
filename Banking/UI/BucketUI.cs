@@ -1,27 +1,26 @@
 using System;
-using Banking.Source;
 using Eto.Forms;
 
 namespace Banking.UI
 {
     public class BucketUi
     {
-        public BucketUi(Sorter.Bucket bucket, Action<string> addTransactionToBucketAction, Action<string>addAllTransactionsToBucketAction , Action<string> removeBucketAction)
+        public BucketUi(string bucket, Action<string> addTransactionToBucketAction, Action<string>addAllTransactionsToBucketAction , Action<string> removeBucketAction)
         {
             Bucket = bucket;
 
-            var addToBucketButton = new Button{Text = Bucket.Name};
+            var addToBucketButton = new Button{Text = Bucket};
             addToBucketButton.Click += delegate
             {
                 if (Keyboard.IsKeyLocked(Keys.CapsLock))
-                    addAllTransactionsToBucketAction(Bucket.Name);
+                    addAllTransactionsToBucketAction(Bucket);
                 else
-                    addTransactionToBucketAction(Bucket.Name);
+                    addTransactionToBucketAction(Bucket);
             };
             var removeBucketButton = new Button {Text = "remove"};
             removeBucketButton.Click += delegate
             {
-                removeBucketAction(Bucket.Name);
+                removeBucketAction(Bucket);
             };
             
             Layout = new TableLayout
@@ -34,7 +33,7 @@ namespace Banking.UI
             };
         }
 
-        private Sorter.Bucket Bucket { get; }
+        private string Bucket { get; }
         public TableLayout Layout { get; }
     }
 }

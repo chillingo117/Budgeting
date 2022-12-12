@@ -1,24 +1,9 @@
 using System;
-using Banking.Source;
 
-namespace Source
+namespace Banking.Source
 {
     public class Transaction
     {
-        protected Transaction(){}
-
-        public Transaction(SortedTransaction transaction)
-        {
-            Date = transaction.Date;
-            Amount = transaction.Amount;
-            Payee = transaction.Payee;
-            Particulars = transaction.Particulars;
-            Code = transaction.Code;
-            Reference = transaction.Reference;
-            OtherPartyAccount = transaction.OtherPartyAccount;
-            Guid = transaction.Guid;
-        }
-
         public DateTime Date { get; set; }
         public decimal Amount { get; set; }
         public string Payee { get; set; }

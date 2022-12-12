@@ -1,9 +1,5 @@
-using System;
-using System.Globalization;
-using System.IO;
 using System.Linq;
 using Banking.Source;
-using CsvHelper;
 using Eto.Drawing;
 using Eto.Forms;
 
@@ -37,21 +33,6 @@ namespace Banking.UI
             AttachSaveSummaryDialog(isTest);
             AttachHistoryMenuItem();
             AttachSortingMenuItem();
-
-            Closed += OnClosed;
-        }
-
-        private void OnClosed(object sender, EventArgs e)
-        {
-            var outputDirectory = Constants.BucketDataFilename;
-
-            var toWrite = Sorter.Buckets.ToList();;
-            
-            using (var writer = new StreamWriter(outputDirectory))
-            using (var csv = new CsvWriter(writer, CultureInfo.InvariantCulture))
-            {
-                csv.WriteRecords(toWrite);
-            }
         }
         
         private Sorter Sorter { get; }

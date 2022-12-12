@@ -4,7 +4,6 @@ using System.Globalization;
 using Banking.Source;
 using Eto.Drawing;
 using Eto.Forms;
-using Source;
 
 namespace Banking.UI
 {
@@ -14,14 +13,14 @@ namespace Banking.UI
         {
             Sorter = sorter;
             ToolBar = new ToolBar();
-            RegexInput = new TextBox{Text = Sorter.RegexFilter};
+            SearchInput = new TextBox{Text = Sorter.SearchFilter};
             AttachAddBucketDialog();
             _refreshUi = refreshUi;
         }
 
         private Sorter Sorter { get; }
         public ToolBar ToolBar { get; }
-        private TextBox RegexInput { get; }
+        private TextBox SearchInput { get; }
         
         private readonly Action _refreshUi;
         private TableRow HeaderRow => new TableRow(
@@ -47,18 +46,18 @@ namespace Banking.UI
             };
             var overallStack = new StackLayout();
             overallStack.Items.Add(buckets);
-            overallStack.Items.Add( SortByRegexControlRow());
+            overallStack.Items.Add( FilterBySearchControlRow());
             overallStack.Items.Add(GetPreviewTransactionsLayout());
             return overallStack;
         }
         
-        private TableLayout SortByRegexControlRow()
+        private TableLayout FilterBySearchControlRow()
         {
-            RegexInput.KeyUp += (sender, args) =>
+            SearchInput.KeyUp += (sender, args) =>
             {
                 if (args.Key == Keys.Enter)
                 {
-                    Sorter.RegexFilter = RegexInput.Text;
+                    Sorter.SearchFilter = SearchInput.Text;
                     _refreshUi();
                 }
             };
@@ -69,8 +68,8 @@ namespace Banking.UI
                 Spacing = new Size(5, 5),
                 Rows = {
                     new TableRow(
-                        new TableCell(new Label{Text = "Regex"}),
-                        new TableCell(RegexInput, true)
+                        new TableCell(new Label{Text = "Search"}),
+                        new TableCell(SearchInput, true)
                     )
                 }
             };
@@ -87,9 +86,9 @@ namespace Banking.UI
                 }
             };
             
-            var transactions = String.IsNullOrWhiteSpace(Sorter.RegexFilter)
+            var transactions = String.IsNullOrWhiteSpace(Sorter.SearchFilter)
                 ? Sorter.Transactions
-                : Sorter.GetRegexTransactions();
+                : Sorter.GetFilteredTransactions();
             
             var rows = new List<TableRow>();
             transactions.ForEach(st => rows.Add(GetPreviewTransactionsRow(st)));

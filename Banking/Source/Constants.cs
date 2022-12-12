@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using System.IO;
 
 namespace Banking.Source
@@ -17,5 +18,23 @@ namespace Banking.Source
         public static readonly string ConfigName = "Banking.sync";
         
         public static readonly string TestConfigName = "TestBanking.sync";
+
+        public static readonly List<string> Buckets = new List<string>
+        {
+            "Other",
+            "Unknown",
+            "Tech",
+            "Alcohol",
+            "Personal Maintenance",
+            "Subscriptions",
+            "Entertainment",
+            "Clothing",
+            "Car",
+            "Hobbies",
+            "Flat",
+            "Food",
+            "Travel",
+            "Internal"
+        };
     }
 }

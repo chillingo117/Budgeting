@@ -4,7 +4,6 @@ using System.Globalization;
 using Banking.Source;
 using Eto.Drawing;
 using Eto.Forms;
-using Source;
 
 namespace Banking.UI
 {

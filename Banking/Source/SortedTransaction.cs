@@ -1,7 +1,6 @@
 using System;
-using Banking.Source;
 
-namespace Source
+namespace Banking.Source
 {
     public class SortedTransaction : Transaction
     {
