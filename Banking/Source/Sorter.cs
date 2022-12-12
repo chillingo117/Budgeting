@@ -27,7 +27,6 @@ namespace Banking.Source
                 }
             }
         }
-
         
         public readonly List<Bucket> Buckets = new List<Bucket>();
 
