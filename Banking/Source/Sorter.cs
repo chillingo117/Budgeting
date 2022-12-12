@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
 using System.Linq;
+using System.Text.RegularExpressions;
 using CsvHelper;
 using Source;
 
@@ -27,13 +28,20 @@ namespace Banking.Source
             }
         }
 
-        public Transaction CurrentTransaction => _transactions.FirstOrDefault();
         
         public readonly List<Bucket> Buckets = new List<Bucket>();
 
         public List<SortedTransaction> SortedTransactions = new List<SortedTransaction>();
 
-        private List<Transaction> _transactions = new List<Transaction>();
+        public List<Transaction> Transactions = new List<Transaction>();
+        public string RegexFilter { get; set; }
+
+        public Transaction CurrentTransaction()
+        {
+            return String.IsNullOrWhiteSpace(RegexFilter)
+                ? Transactions.FirstOrDefault()
+                : GetRegexTransactions().FirstOrDefault();
+        }
 
         public void AddBucket(string bucketName)
         {
@@ -49,7 +57,7 @@ namespace Banking.Source
             if (bucketToRemove == null)
                 return;
 
-            _transactions.InsertRange(0, SortedTransactions.Where(st => st.Bucket == bucketName));
+            Transactions.InsertRange(0, SortedTransactions.Where(st => st.Bucket == bucketName));
             SortedTransactions = SortedTransactions.Where(st => st.Bucket != bucketName).ToList();
 
             Buckets.Remove(bucketToRemove);
@@ -57,15 +65,20 @@ namespace Banking.Source
 
         public void AssignTransactionToBucket(string name)
         {
-            SortedTransactions.Add(new SortedTransaction(CurrentTransaction, name));
-            _transactions.Remove(CurrentTransaction);
+            SortedTransactions.Add(new SortedTransaction(CurrentTransaction(), name));
+            Transactions.Remove(CurrentTransaction());
         }
 
         public void UndoTransactionSort(Guid transactionId)
         {
             var transactionToUnsort = SortedTransactions.Find(st => st.Guid == transactionId);
             SortedTransactions.Remove(transactionToUnsort);
-            _transactions.Insert(0, transactionToUnsort);
+            Transactions.Insert(0, transactionToUnsort);
+        }
+        
+        public List<Transaction> GetRegexTransactions()
+        {
+            return Transactions.Where(t => Regex.IsMatch(t.Payee, RegexFilter)).ToList();
         }
 
         public void LoadData(string file)
@@ -74,8 +87,8 @@ namespace Banking.Source
             using (var csv = new CsvReader(reader, CultureInfo.InvariantCulture))
             {
                 csv.Context.RegisterClassMap<TransactionCsvMap>();
-                _transactions = csv.GetRecords<Transaction>().ToList();
-                _transactions.ForEach(t => t.Guid = Guid.NewGuid());
+                Transactions = csv.GetRecords<Transaction>().ToList();
+                Transactions.ForEach(t => t.Guid = Guid.NewGuid());
             }
         }
     }

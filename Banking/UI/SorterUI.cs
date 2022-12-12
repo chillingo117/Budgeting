@@ -1,8 +1,10 @@
 using System;
+using System.Collections.Generic;
 using System.Globalization;
 using Banking.Source;
 using Eto.Drawing;
 using Eto.Forms;
+using Source;
 
 namespace Banking.UI
 {
@@ -13,11 +15,13 @@ namespace Banking.UI
             Sorter = sorter;
             ToolBar = new ToolBar();
             AttachAddBucketDialog();
+            AttachSortByRegexDialog();
             _refreshUi = refreshUi;
         }
 
         private Sorter Sorter { get; }
         public ToolBar ToolBar { get; }
+        
         private readonly Action _refreshUi;
         private TableRow HeaderRow => new TableRow(
             new TableCell(new Label {Text = "Date"}, true),
@@ -31,15 +35,6 @@ namespace Banking.UI
         
         public StackLayout Layout()
         {
-            var table = new TableLayout
-            {
-                Padding = 10,
-                Spacing = new Size(5, 5),
-                Rows = {
-                    HeaderRow,
-                    GetCurrentTransactionTableRow()
-                }
-            };
             var buckets = new TableLayout
             {
                 Padding = 10,
@@ -50,8 +45,8 @@ namespace Banking.UI
                 }
             };
             var overallStack = new StackLayout();
-            overallStack.Items.Add(table);
             overallStack.Items.Add(buckets);
+            overallStack.Items.Add(GetPreviewTransactionsLayout());
             return overallStack;
         }
 
@@ -75,26 +70,6 @@ namespace Banking.UI
             layout.Items.Add(subLayoutRow);
             return layout;
         }
-
-        private TableRow GetCurrentTransactionTableRow()
-        {
-            var currentTransaction = Sorter.CurrentTransaction;
-            if (currentTransaction != null)
-            {
-                var amountCell = new TableCell(new Label {Text = currentTransaction.Amount.ToString(CultureInfo.InvariantCulture)}, true);
-                amountCell.Control.BackgroundColor = currentTransaction.Amount < 0 ? Colors.OrangeRed : Colors.LimeGreen;
-                return new TableRow(
-                    new TableCell(new Label {Text = currentTransaction.Date.ToString(CultureInfo.InvariantCulture)}, true),
-                    amountCell,
-                    new TableCell(new Label {Text = currentTransaction.Payee}, true),
-                    new TableCell(new Label {Text = currentTransaction.Particulars}, true),
-                    new TableCell(new Label {Text = currentTransaction.Code}, true),
-                    new TableCell(new Label {Text = currentTransaction.Reference}, true),
-                    new TableCell(new Label {Text = currentTransaction.OtherPartyAccount}, true)
-                );
-            }
-            return new TableRow();
-        }
         
         private void AttachAddBucketDialog()
         {
@@ -108,6 +83,57 @@ namespace Banking.UI
             ToolBar.Items.Add(addBucket);
         }
         
+        private void AttachSortByRegexDialog()
+        {
+            var sortByRegex = new Command {ToolBarText = "Sort by Regex"};
+            sortByRegex.Executed += (sender, e) => {     
+                var dialog = new SortByRegexDialog();
+                dialog.ShowModal();
+                Sorter.RegexFilter = dialog.Result;
+                _refreshUi();
+            };
+            ToolBar.Items.Add(sortByRegex);
+        }
+        
+        private StackLayout GetPreviewTransactionsLayout()
+        {
+            var table = new TableLayout
+            {
+                Padding = 10,
+                Spacing = new Size(5, 5),
+                Rows = {
+                    HeaderRow
+                }
+            };
+            
+            var transactions = String.IsNullOrWhiteSpace(Sorter.RegexFilter)
+                ? Sorter.Transactions
+                : Sorter.GetRegexTransactions();
+            
+            var rows = new List<TableRow>();
+            transactions.ForEach(st => rows.Add(GetPreviewTransactionsRow(st)));
+            rows.ForEach(row => table.Rows.Add(row));
+
+            var overallStack = new StackLayout();
+            overallStack.Items.Add(table);
+            return overallStack;        
+        }
+
+        private TableRow GetPreviewTransactionsRow(Transaction transaction)
+        {
+            var amountCell = new TableCell(new Label {Text = transaction.Amount.ToString(CultureInfo.InvariantCulture)}, true);
+            amountCell.Control.BackgroundColor = transaction.Amount < 0 ? Colors.OrangeRed : Colors.LimeGreen;
+            return new TableRow(
+                new TableCell(new Label {Text = transaction.Date.ToString(CultureInfo.InvariantCulture)}, true),
+                amountCell,
+                new TableCell(new Label {Text = transaction.Payee}, true),
+                new TableCell(new Label {Text = transaction.Particulars}, true),
+                new TableCell(new Label {Text = transaction.Code}, true),
+                new TableCell(new Label {Text = transaction.Reference}, true),
+                new TableCell(new Label {Text = transaction.OtherPartyAccount}, true)
+            );
+        }
+
         private void AddCurrentTransactionToBucket(string name)
         {
             Sorter.AssignTransactionToBucket(name);

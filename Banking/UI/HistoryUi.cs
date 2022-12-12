@@ -44,9 +44,9 @@ namespace Banking.UI
             };
             GetSortedTransactions().ForEach(row => table.Rows.Add(row));
 
-            var overallStack = new StackLayout();
-            overallStack.Items.Add(table);
-            return overallStack;
+            var layout = new StackLayout{Width = 1200, Spacing = 10};
+            layout.Items.Add(table);
+            return layout;
         }
 
         private List<TableRow> GetSortedTransactions()
