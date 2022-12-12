@@ -36,7 +36,7 @@ namespace Banking.Source
         public List<Transaction> Transactions = new List<Transaction>();
         public string RegexFilter { get; set; }
 
-        public Transaction CurrentTransaction()
+        private Transaction CurrentTransaction()
         {
             return String.IsNullOrWhiteSpace(RegexFilter)
                 ? Transactions.FirstOrDefault()
@@ -65,13 +65,29 @@ namespace Banking.Source
 
         public void AssignTransactionToBucket(string name)
         {
+            if (CurrentTransaction() == default)
+                return;
             SortedTransactions.Add(new SortedTransaction(CurrentTransaction(), name));
             Transactions.Remove(CurrentTransaction());
+        }
+        
+        public void AssignAllTransactionsToBucket(string name)
+        {
+            var transactions = GetRegexTransactions();
+            if (!transactions.Any())
+                return;
+            transactions.ForEach(t =>
+            {
+                SortedTransactions.Add(new SortedTransaction(t, name));
+                Transactions.Remove(t);
+            });
         }
 
         public void UndoTransactionSort(Guid transactionId)
         {
-            var transactionToUnsort = SortedTransactions.Find(st => st.Guid == transactionId);
+            var transactionToUnsort = SortedTransactions.SingleOrDefault(st => st.Guid == transactionId);
+            if (transactionToUnsort == default)
+                return;
             SortedTransactions.Remove(transactionToUnsort);
             Transactions.Insert(0, transactionToUnsort);
         }

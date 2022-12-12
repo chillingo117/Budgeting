@@ -14,13 +14,14 @@ namespace Banking.UI
         {
             Sorter = sorter;
             ToolBar = new ToolBar();
+            RegexInput = new TextBox{Text = Sorter.RegexFilter};
             AttachAddBucketDialog();
-            AttachSortByRegexDialog();
             _refreshUi = refreshUi;
         }
 
         private Sorter Sorter { get; }
         public ToolBar ToolBar { get; }
+        private TextBox RegexInput { get; }
         
         private readonly Action _refreshUi;
         private TableRow HeaderRow => new TableRow(
@@ -46,55 +47,35 @@ namespace Banking.UI
             };
             var overallStack = new StackLayout();
             overallStack.Items.Add(buckets);
+            overallStack.Items.Add( SortByRegexControlRow());
             overallStack.Items.Add(GetPreviewTransactionsLayout());
             return overallStack;
         }
-
-        private StackLayout BucketsLayout()
+        
+        private TableLayout SortByRegexControlRow()
         {
-            var layout = new StackLayout{Width = 1200, Spacing = 10};
-
-            var count = 0;
-            var subLayoutRow = new StackLayout{Width = 1200, Orientation = Orientation.Horizontal, Spacing = 5};
-
-            foreach (var bucket in Sorter.Buckets)
+            RegexInput.KeyUp += (sender, args) =>
             {
-                subLayoutRow.Items.Add(new BucketUi(bucket, AddCurrentTransactionToBucket, RemoveBucket).Layout);
-                if (count++ > 10)
+                if (args.Key == Keys.Enter)
                 {
-                    count = 0;
-                    layout.Items.Add(subLayoutRow);
-                    subLayoutRow = new StackLayout{Width = 1200, Orientation = Orientation.Horizontal, Spacing = 5};
+                    Sorter.RegexFilter = RegexInput.Text;
+                    _refreshUi();
                 }
-            }
-            layout.Items.Add(subLayoutRow);
-            return layout;
-        }
-        
-        private void AttachAddBucketDialog()
-        {
-            var addBucket = new Command {ToolBarText = "Add Bucket"};
-            addBucket.Executed += (sender, e) => {     
-                var dialog = new AddBucketDialog();
-                dialog.ShowModal();
-                Sorter.AddBucket(dialog.Result);
-                _refreshUi();
             };
-            ToolBar.Items.Add(addBucket);
-        }
-        
-        private void AttachSortByRegexDialog()
-        {
-            var sortByRegex = new Command {ToolBarText = "Sort by Regex"};
-            sortByRegex.Executed += (sender, e) => {     
-                var dialog = new SortByRegexDialog();
-                dialog.ShowModal();
-                Sorter.RegexFilter = dialog.Result;
-                _refreshUi();
+
+            return new TableLayout
+            {
+                Padding = 10,
+                Spacing = new Size(5, 5),
+                Rows = {
+                    new TableRow(
+                        new TableCell(new Label{Text = "Regex"}),
+                        new TableCell(RegexInput, true)
+                    )
+                }
             };
-            ToolBar.Items.Add(sortByRegex);
         }
-        
+
         private StackLayout GetPreviewTransactionsLayout()
         {
             var table = new TableLayout
@@ -133,10 +114,49 @@ namespace Banking.UI
                 new TableCell(new Label {Text = transaction.OtherPartyAccount}, true)
             );
         }
+        
+        private StackLayout BucketsLayout()
+        {
+            var layout = new StackLayout{Width = 1200, Spacing = 10};
+
+            var count = 0;
+            var subLayoutRow = new StackLayout{Width = 1200, Orientation = Orientation.Horizontal, Spacing = 5};
+
+            foreach (var bucket in Sorter.Buckets)
+            {
+                subLayoutRow.Items.Add(new BucketUi(bucket, AddCurrentTransactionToBucket, AddAllTransactionsToBucket, RemoveBucket).Layout);
+                if (count++ > 10)
+                {
+                    count = 0;
+                    layout.Items.Add(subLayoutRow);
+                    subLayoutRow = new StackLayout{Width = 1200, Orientation = Orientation.Horizontal, Spacing = 5};
+                }
+            }
+            layout.Items.Add(subLayoutRow);
+            return layout;
+        }
+        
+        private void AttachAddBucketDialog()
+        {
+            var addBucket = new Command {ToolBarText = "Add Bucket"};
+            addBucket.Executed += (sender, e) => {     
+                var dialog = new AddBucketDialog();
+                dialog.ShowModal();
+                Sorter.AddBucket(dialog.Result);
+                _refreshUi();
+            };
+            ToolBar.Items.Add(addBucket);
+        }
 
         private void AddCurrentTransactionToBucket(string name)
         {
             Sorter.AssignTransactionToBucket(name);
+            _refreshUi();
+        }
+
+        private void AddAllTransactionsToBucket(string name)
+        {
+            Sorter.AssignAllTransactionsToBucket(name);
             _refreshUi();
         }
 
